@@ -1,6 +1,8 @@
+// lib/supabase/middleware.ts
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+// Cambiar el nombre de la función a updateSession
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -29,25 +31,26 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // IMPORTANTE: No escribir lógica entre createServerClient y getUser()
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Rutas protegidas - redirigir a login si no hay usuario
-  const protectedPaths = ['/dashboard', '/patients', '/registers'];
-  const isProtectedPath = protectedPaths.some(path => 
-    request.nextUrl.pathname.startsWith(path)
-  );
+  const { pathname } = request.nextUrl;
 
+  // Rutas protegidas
+  const protectedPaths = ['/dashboard'];
+  const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
+
+  // Si NO hay usuario y está intentando acceder a ruta protegida
   if (!user && isProtectedPath) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
   }
 
-  // Redirigir usuarios autenticados desde /login a su dashboard
-  if (user && request.nextUrl.pathname === '/login') {
+  // Si HAY usuario y está en /login, redirigir a su dashboard
+  if (user && pathname === '/login') {
+    // Obtener el rol del usuario
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
@@ -55,12 +58,20 @@ export async function updateSession(request: NextRequest) {
       .single();
 
     const url = request.nextUrl.clone();
-    url.pathname =
-      profile?.role === 'psychologist'
-        ? '/dashboard/psychologist'
-        : '/dashboard/patient';
+    
+    if (profile?.role === 'psychologist') {
+      url.pathname = '/dashboard/psychologist';
+    } else if (profile?.role === 'patient') {
+      url.pathname = '/dashboard/patient';
+    } else {
+      // Si no tiene rol definido, dejar en login
+      return supabaseResponse;
+    }
+    
     return NextResponse.redirect(url);
   }
 
+  // IMPORTANTE: Si el usuario está accediendo a /dashboard/patient o /dashboard/psychologist
+  // NO hacer nada, dejar pasar
   return supabaseResponse;
 }

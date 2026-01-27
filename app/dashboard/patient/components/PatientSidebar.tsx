@@ -1,12 +1,11 @@
-// app/dashboard/psychologist/components/DashboardSidebar.tsx
+// app/dashboard/patient/components/PatientSidebar.tsx
 'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
-  Brain, 
-  Users, 
+  Activity, 
   FileText, 
   BarChart3, 
   Settings, 
@@ -14,8 +13,8 @@ import {
   Menu,
   X,
   Home,
-  Activity,
-  Sparkles
+  User,
+  Calendar
 } from 'lucide-react';
 import { logout } from '@/app/actions/auth';
 
@@ -23,19 +22,18 @@ interface Props {
   userName: string;
   userEmail: string;
   avatarUrl: string | null;
-  subscriptionStatus: string;
+  psychologistName?: string | null;
 }
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard/psychologist', icon: Home },
-  { name: 'Pacientes', href: '/dashboard/psychologist/patients', icon: Users },
-  { name: 'Registros', href: '/dashboard/psychologist/registers', icon: FileText },
-  { name: 'Entradas', href: '/dashboard/psychologist/entries', icon: Activity },
-  { name: 'Análisis', href: '/dashboard/psychologist/analytics', icon: BarChart3 },
-  { name: 'Configuración', href: '/dashboard/psychologist/settings', icon: Settings },
+  { name: 'Inicio', href: '/dashboard/patient', icon: Home },
+  { name: 'Mis Registros', href: '/dashboard/patient/registers', icon: FileText },
+  { name: 'Historial', href: '/dashboard/patient/history', icon: Calendar },
+  { name: 'Mi Progreso', href: '/dashboard/patient/progress', icon: BarChart3 },
+  { name: 'Configuración', href: '/dashboard/patient/settings', icon: Settings },
 ];
 
-export default function DashboardSidebar({ userName, userEmail, avatarUrl, subscriptionStatus }: Props) {
+export default function PatientSidebar({ userName, userEmail, avatarUrl, psychologistName }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
 
@@ -71,15 +69,15 @@ export default function DashboardSidebar({ userName, userEmail, avatarUrl, subsc
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="p-6 border-b border-gray-200">
-            <Link href="/dashboard/psychologist" className="flex items-center gap-3">
+            <Link href="/dashboard/patient" className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
-                <Brain className="w-6 h-6 text-white" />
+                <Activity className="w-6 h-6 text-white" />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-800">
                   Mood<span className="text-teal-600">Log</span>
                 </h1>
-                <p className="text-xs text-gray-500">Panel de control</p>
+                <p className="text-xs text-gray-500">Mi espacio</p>
               </div>
             </Link>
           </div>
@@ -100,24 +98,22 @@ export default function DashboardSidebar({ userName, userEmail, avatarUrl, subsc
               </div>
             </div>
             
-            {/* Subscription badge */}
-            <div className="mt-3">
-              {subscriptionStatus === 'trialing' && (
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-purple-50 border border-purple-200 rounded-lg">
-                  <Sparkles className="w-4 h-4 text-purple-600" />
-                  <span className="text-xs font-medium text-purple-700">
-                    Prueba gratuita
-                  </span>
+            {/* Psychologist info */}
+            {psychologistName && (
+              <div className="mt-3 p-3 bg-teal-50 border border-teal-200 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <User className="w-4 h-4 text-teal-600" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-teal-700 font-medium">
+                      Tu psicólogo/a
+                    </p>
+                    <p className="text-sm text-teal-900 font-semibold truncate">
+                      {psychologistName}
+                    </p>
+                  </div>
                 </div>
-              )}
-              {subscriptionStatus === 'active' && (
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-teal-50 border border-teal-200 rounded-lg">
-                  <span className="text-xs font-medium text-teal-700">
-                    Plan Pro
-                  </span>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Navigation */}
@@ -147,8 +143,17 @@ export default function DashboardSidebar({ userName, userEmail, avatarUrl, subsc
             })}
           </nav>
 
-          {/* Logout button */}
+          {/* Help section */}
           <div className="p-4 border-t border-gray-200">
+            <div className="bg-gradient-to-r from-teal-50 to-purple-50 border border-teal-200 rounded-lg p-4 mb-3">
+              <p className="text-xs font-medium text-teal-900 mb-1">
+                💡 ¿Necesitas ayuda?
+              </p>
+              <p className="text-xs text-teal-700">
+                Contacta con tu psicólogo/a si tienes dudas sobre tus registros
+              </p>
+            </div>
+
             <button
               onClick={handleLogout}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 font-medium transition-colors"
