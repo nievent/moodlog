@@ -1,9 +1,10 @@
 // app/dashboard/psychologist/entries/components/ViewPatientEntryModal.tsx
 'use client';
 
-import { X, Calendar, User, MessageSquare, FileText } from 'lucide-react';
+import { X, Calendar, User, MessageSquare, FileText, TrendingUp } from 'lucide-react';
 import { AutoRegisterFields, RegisterEntryData } from '@/types/database.types';
 import ClinicalNotesSection from './ClinicalNotesSection';
+import Link from 'next/link';
 
 interface Entry {
   id: string;
@@ -240,12 +241,21 @@ export default function ViewPatientEntryModal({ entry, onClose }: Props) {
 
         {/* Footer */}
         <div className="p-6 border-t border-gray-200 bg-gray-50">
-          <button
-            onClick={onClose}
-            className="w-full px-6 py-3 bg-gray-900 text-white rounded-xl font-medium hover:bg-gray-800 transition-colors"
-          >
-            Cerrar
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              className="flex-1 px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+            >
+              Cerrar
+            </button>
+            <Link
+              href={`/dashboard/psychologist/patients/${entry.patient?.id}/progress`}
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-medium hover:shadow-lg transition-all inline-flex items-center justify-center gap-2"
+            >
+              <TrendingUp size={20} />
+              Ver Progreso
+            </Link>
+          </div>
         </div>
       </div>
     </div>

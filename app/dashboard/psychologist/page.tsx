@@ -1,7 +1,7 @@
 // app/dashboard/psychologist/page.tsx
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { Users, FileText, TrendingUp, Clock, Plus, Activity } from 'lucide-react';
+import { Users, FileText, TrendingUp, Plus, Activity } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function PsychologistDashboard() {
@@ -151,24 +151,34 @@ export default async function PsychologistDashboard() {
         {recentPatients && recentPatients.length > 0 ? (
           <div className="space-y-3">
             {recentPatients.map((patient) => (
-              <Link
-                key={patient.id}
-                href={`/dashboard/psychologist/patients/${patient.id}`}
-                className="flex items-center gap-4 p-4 rounded-lg hover:bg-gray-50 transition-colors group"
-              >
+              <div key={patient.id} className="flex items-center gap-4 p-4 rounded-lg hover:bg-gray-50 transition-colors">
                 <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-purple-400 rounded-full flex items-center justify-center text-white font-semibold">
                   {patient.full_name.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-gray-900 group-hover:text-teal-600">
+                  <p className="font-medium text-gray-900">
                     {patient.full_name}
                   </p>
                   <p className="text-sm text-gray-500">
                     Añadido {new Date(patient.created_at).toLocaleDateString('es-ES')}
                   </p>
                 </div>
-                <Clock className="w-5 h-5 text-gray-400" />
-              </Link>
+                <div className="flex gap-2">
+                  <Link
+                    href={`/dashboard/psychologist/patients/${patient.id}/progress`}
+                    className="px-3 py-1.5 bg-purple-100 text-purple-600 rounded-lg text-sm font-medium hover:bg-purple-200 transition-colors inline-flex items-center gap-1"
+                  >
+                    <TrendingUp size={16} />
+                    Progreso
+                  </Link>
+                  <Link
+                    href={`/dashboard/psychologist/patients/${patient.id}`}
+                    className="px-3 py-1.5 bg-teal-100 text-teal-600 rounded-lg text-sm font-medium hover:bg-teal-200 transition-colors"
+                  >
+                    Ver perfil
+                  </Link>
+                </div>
+              </div>
             ))}
           </div>
         ) : (

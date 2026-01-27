@@ -2,9 +2,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, Eye, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
+import { Calendar, Eye, MessageSquare, ChevronDown, ChevronUp, TrendingUp } from 'lucide-react';
 import { AutoRegisterFields, RegisterEntryData } from '@/types/database.types';
 import ViewPatientEntryModal from './ViewPatientEntryModal';
+import Link from 'next/link';
 
 interface Entry {
   id: string;
@@ -147,13 +148,22 @@ export default function PatientEntryCard({ entry }: Props) {
           )}
 
           {/* Action */}
-          <button
-            onClick={() => setShowViewModal(true)}
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-500 to-purple-500 text-white rounded-lg font-medium hover:shadow-md transition-all"
-          >
-            <Eye size={18} />
-            Ver Detalles Completos
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowViewModal(true)}
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-500 to-purple-500 text-white rounded-lg font-medium hover:shadow-md transition-all"
+            >
+              <Eye size={18} />
+              Ver Detalles
+            </button>
+            <Link
+              href={`/dashboard/psychologist/patients/${entry.patient_id}/progress`}
+              className="px-4 py-2 bg-white border border-purple-300 text-purple-600 rounded-lg hover:bg-purple-50 transition-colors inline-flex items-center justify-center"
+              title="Ver progreso"
+            >
+              <TrendingUp size={18} />
+            </Link>
+          </div>
         </div>
 
         {/* Footer */}
