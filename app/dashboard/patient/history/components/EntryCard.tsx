@@ -25,9 +25,10 @@ interface Entry {
 
 interface Props {
   entry: Entry;
+  psychologistName?: string | null;
 }
 
-export default function EntryCard({ entry }: Props) {
+export default function EntryCard({ entry, psychologistName }: Props) {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -213,6 +214,7 @@ export default function EntryCard({ entry }: Props) {
       {showViewModal && (
         <ViewEntryModal
           entry={entry}
+          psychologistName={psychologistName}
           onClose={() => setShowViewModal(false)}
         />
       )}

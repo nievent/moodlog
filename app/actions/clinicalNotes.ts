@@ -132,6 +132,7 @@ export async function deleteClinicalNote(noteId: string) {
   }
 }
 
+// Función para PSICÓLOGOS - Ver sus propias notas
 export async function getClinicalNotes(entryId: string) {
   const supabase = await createClient();
 
@@ -151,6 +152,54 @@ export async function getClinicalNotes(entryId: string) {
 
     if (error) {
       console.error('Error fetching notes:', error);
+      return { error: 'Error al cargar las notas', notes: [] };
+    }
+
+    return { notes: notes || [] };
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return { error: 'Error inesperado', notes: [] };
+  }
+}
+
+// Nueva función para PACIENTES - Ver las notas de su psicólogo
+export async function getClinicalNotesForPatient(entryId: string) {
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    return { error: 'No autenticado', notes: [] };
+  }
+
+  try {
+    // Primero verificar que esta entrada pertenece al paciente
+    const { data: entry, error: entryError } = await supabase
+      .from('register_entries')
+      .select('patient_id')
+      .eq('id', entryId)
+      .single();
+
+    if (entryError || !entry) {
+      console.error('Error fetching entry:', entryError);
+      return { error: 'Entrada no encontrada', notes: [] };
+    }
+
+    // Verificar que el usuario actual es el paciente dueño de esta entrada
+    if (entry.patient_id !== user.id) {
+      return { error: 'No tienes permiso para ver estas notas', notes: [] };
+    }
+
+    // Obtener las notas clínicas (del psicólogo para este paciente)
+    // Solo devolvemos los campos necesarios (sin psychologist_id)
+    const { data: notes, error } = await supabase
+      .from('clinical_notes')
+      .select('id, note, created_at, updated_at')
+      .eq('entry_id', entryId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching clinical notes:', error);
       return { error: 'Error al cargar las notas', notes: [] };
     }
 

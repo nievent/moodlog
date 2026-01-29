@@ -14,6 +14,25 @@ export default async function HistoryPage() {
     redirect('/login');
   }
 
+  // Obtener perfil del paciente con psicólogo
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('psychologist_id')
+    .eq('id', user.id)
+    .single();
+
+  // Obtener nombre del psicólogo
+  let psychologistName = null;
+  if (profile?.psychologist_id) {
+    const { data: psychologist } = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', profile.psychologist_id)
+      .single();
+    
+    psychologistName = psychologist?.full_name;
+  }
+
   // Obtener todas las entradas del paciente
   const { data: entriesRaw } = await supabase
     .from('register_entries')
@@ -108,6 +127,9 @@ export default async function HistoryPage() {
         <h1 className="text-3xl font-bold text-gray-900">Historial de Entradas</h1>
         <p className="text-gray-600 mt-1">
           Todas tus entradas registradas
+          {psychologistName && (
+            <span className="text-purple-600 font-medium"> • Tu psicólogo/a: {psychologistName}</span>
+          )}
         </p>
       </div>
 
@@ -189,7 +211,11 @@ export default async function HistoryPage() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {group.entries.map((entry) => (
-                  <EntryCard key={entry.id} entry={entry} />
+                  <EntryCard 
+                    key={entry.id} 
+                    entry={entry}
+                    psychologistName={psychologistName}
+                  />
                 ))}
               </div>
             </div>

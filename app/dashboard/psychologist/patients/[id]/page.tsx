@@ -3,7 +3,6 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { ArrowLeft, Calendar, Mail, User, Clock, FileText, Activity, TrendingUp, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import { RegisterEntryData, AutoRegisterFields } from '@/types/database.types';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -250,12 +249,18 @@ export default async function PatientProfilePage({ params }: PageProps) {
         {assignmentsRaw && assignmentsRaw.length > 0 ? (
           <div className="space-y-3">
             {assignmentsRaw.map((assignment) => {
-              const register = assignment.auto_registers;
+              // FIX 1: Extraer el registro correctamente (puede ser array o objeto)
+              const register = Array.isArray(assignment.auto_registers) 
+                ? assignment.auto_registers[0] 
+                : assignment.auto_registers;
+              
+              // FIX 2: Type assertion para evitar el error de 'any'
+              const frequency = assignment.frequency || 'as_needed';
               const frequencyLabel = {
                 daily: 'Diario',
                 weekly: 'Semanal',
                 as_needed: 'Libre',
-              }[assignment.frequency || 'as_needed'];
+              }[frequency as 'daily' | 'weekly' | 'as_needed'];
 
               return (
                 <div key={assignment.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
@@ -263,7 +268,7 @@ export default async function PatientProfilePage({ params }: PageProps) {
                     <FileText className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold text-gray-900">{register?.name}</p>
+                    <p className="font-semibold text-gray-900">{register?.name || 'Registro sin nombre'}</p>
                     <p className="text-sm text-gray-600">
                       {frequencyLabel} · Desde {new Date(assignment.start_date).toLocaleDateString('es-ES')}
                     </p>
